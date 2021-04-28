@@ -1,13 +1,4 @@
-# FileDB
-
-FileDB is a free, fast, multiplatform, lightweight .NET Standard database library.
-
-Databases are split into tables (stored as folders). Tables are split into rows (stored as JSON files). Rows are split into columns (stored as first-level properties in a JSON file).
-
-## How to Use
-
-```C#
-using System;
+﻿using System;
 using System.IO;
 
 namespace FileDB.Sample
@@ -49,13 +40,3 @@ namespace FileDB.Sample
         }
     }
 }
-
-```
-
-## Features
-
-- Extremely easy to use.
-- Multiplatform (platform agnostic).
-- Each row is a simply JSON file. Therefore it can be easily stored on disk, network share, Google Drive, OneDrive...
-- Row contents can be any serializable object. The value of a row can be an integer, a float, a string, or your own class.
-- Read/write operations are asynchronous, so DB access does not necessarily block the rest of your application.
