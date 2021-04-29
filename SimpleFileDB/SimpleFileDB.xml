@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SimpleFileDB</name>
+    </assembly>
+    <members>
+        <member name="T:SimpleFileDB.SimpleFileDB">
+            <summary>
+            Simple File Database. Tables are stored as folders, rows as plain text files, and columns as first-level JSON properties.
+            </summary>
+        </member>
+        <member name="F:SimpleFileDB.SimpleFileDB.PathRoot">
+            <summary>Path to the directory that contains the entire database.</summary>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDB.#ctor(System.String)">
+            <summary>Creates a new database object which allows accessing the file-based database stored at the given path.</summary>
+            <param name="pathroot">Path to the directory that contains the database. This folder must exist.</param>
+        </member>
+        <member name="P:SimpleFileDB.SimpleFileDB.Item(System.String)">
+            <summary>Retrieve a table.</summary>
+            <param name="table">Table name/index/ID.</param>
+            <returns>Object which represents a table and allows accessing its rows.</returns>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDB.CreateTable(System.String)">
+            <summary>Create a new table.</summary>
+            <param name="table">Table name/index/ID.</param>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDB.TableExists(System.String)">
+            <summary>Check if a table exists.</summary>
+            <param name="index">Table name/index/ID.</param>
+            <returns>True if the table exists. Otherwise false.</returns>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDB.GetTable``1(System.String)">
+            <summary>Retrieve a table object when the table class has been customized/extended.</summary>
+            <typeparam name="T">Class which represents the table. It must derived from <see cref="T:SimpleFileDB.SimpleFileDBTable"/>.</typeparam>
+            <param name="table">Table name/index/ID.</param>
+            <returns>The table object.</returns>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDB.DeleteTable(System.String,System.Boolean)">
+            <summary>Delete a table and, optionally, its contents.</summary>
+            <param name="tableindex">Table name/index/ID.</param>
+            <param name="deletecontents">If true, the contents (rows) of the table are also deleted. If false and the table is not empty it throws an exception.</param>
+        </member>
+        <member name="T:SimpleFileDB.SimpleFileDBTable">
+            <summary>Represents a table in the <see cref="T:SimpleFileDB.SimpleFileDB"/>. It allows reading and writing rows.</summary>
+        </member>
+        <member name="P:SimpleFileDB.SimpleFileDBTable.DB">
+            <summary>The database this table belongs to.</summary>
+        </member>
+        <member name="P:SimpleFileDB.SimpleFileDBTable.TableID">
+            <summary>Table Name/Index/ID.</summary>
+        </member>
+        <member name="P:SimpleFileDB.SimpleFileDBTable.PathTable">
+            <summary>Path to the directory which represents this table and therefore contains all its rows.</summary>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDBTable.#ctor(SimpleFileDB.SimpleFileDB,System.String)">
+            <summary>Create a new object that represents a Simple File Database table.</summary>
+            <param name="db">Database this table belongs to.</param>
+            <param name="tableid">Table name/index/ID.</param>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDBTable.RowExists(System.String)">
+            <summary>Check if a row exists.</summary>
+            <param name="index">Row index.</param>
+            <returns>True if the row exists. Otherwise false.</returns>
+        </member>
+        <member name="P:SimpleFileDB.SimpleFileDBTable.AllKeys">
+            <summary>List of all row IDs.</summary>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDBTable.GetRow``1(System.String)">
+            <summary>Retrieves a row from the database. Throws an exception if it doesn't exist.</summary>
+            <typeparam name="T">Parse it as the given type.</typeparam>
+            <param name="v">Row ID (index).</param>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDBTable.WriteRow(System.String,System.Object)">
+            <summary>Store an object as a row.</summary>
+            <param name="rowindex">Row ID (index).</param>
+            <param name="value">Value of the row.</param>
+        </member>
+        <member name="P:SimpleFileDB.SimpleFileDBTable.Item(System.String)">
+            <summary>Reads or writes a row.</summary>
+            <param name="rowindex">Row ID (index).</param>
+            <returns>The row, as a raw object.</returns>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDBTable.GetRowCreationTime(System.String)">
+            <summary>Get the time when a row was created.</summary>
+            <param name="rowindex">Row ID (index).</param>
+        </member>
+        <member name="M:SimpleFileDB.SimpleFileDBTable.Delete(System.String)">
+            <summary>Delete a row.</summary>
+            <param name="rowindex">Row ID (index).</param>
+        </member>
+    </members>
+</doc>

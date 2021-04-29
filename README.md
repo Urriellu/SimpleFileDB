@@ -4,7 +4,7 @@ SimpleFileDB is a free, fast, multiplatform, lightweight .NET Standard database 
 
 Databases are split into tables (stored as folders). Tables are split into rows (stored as JSON files). Rows are split into columns (stored as first-level properties in a JSON file).
 
-## How to Use
+## Usage
 
 ```C#
 using System;
