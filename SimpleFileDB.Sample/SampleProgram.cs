@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace FileDB.Sample
+namespace SimpleFileDB.Sample
 {
     class MySampleRowClass
     {
@@ -23,7 +23,7 @@ namespace FileDB.Sample
             string table1_row1_index = "first row";
             string table1_row2_index = "second row";
 
-            FileDB db = new FileDB(pathdb);
+            SimpleFileDB db = new SimpleFileDB(pathdb);
 
             db.CreateTable(table1_name);
             db[table1_name][table1_row1_index] = "the content of the first row is simply a string";

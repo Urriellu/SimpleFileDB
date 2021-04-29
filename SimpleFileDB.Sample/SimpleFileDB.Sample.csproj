@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FileDB\FileDB.csproj" />
+    <ProjectReference Include="..\SimpleFileDB\SimpleFileDB.csproj" />
   </ItemGroup>
 
 </Project>

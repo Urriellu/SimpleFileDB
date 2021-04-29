@@ -3,10 +3,10 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace FileDB
+namespace SimpleFileDB
 {
     [TestClass]
-    public class FileDBTests
+    public class SimpleFileDBTests
     {
         static Random rnd = new Random();
         public static string RandomString(int minlength, int maxlength) => RandomString(rnd.Next(minlength, maxlength));
@@ -21,16 +21,16 @@ namespace FileDB
         }
 
         [TestMethod]
-        public void FileDB_T01()
+        public void SimpleFileDB_T01()
         {
             string pathdb = Path.GetTempFileName();
             File.Delete(pathdb);
             Directory.CreateDirectory(pathdb);
 
-            string table1_name = RandomString(3, 15, FileDB.ValidIndexChars);
-            string table1_row1_index = RandomString(3, 15, FileDB.ValidIndexChars);
+            string table1_name = RandomString(3, 15, SimpleFileDB.ValidIndexChars);
+            string table1_row1_index = RandomString(3, 15, SimpleFileDB.ValidIndexChars);
 
-            FileDB db = new FileDB(pathdb);
+            SimpleFileDB db = new SimpleFileDB(pathdb);
 
             // Create table
             Assert.IsFalse(db.TableExists(table1_name));

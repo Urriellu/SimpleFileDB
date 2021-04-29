@@ -7,18 +7,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FileDB
+namespace SimpleFileDB
 {
-    public class FileDBTable
+    public class SimpleFileDBTable
     {
-        public FileDB DB { get; internal set; }
+        public SimpleFileDB DB { get; internal set; }
         public string TableID { get; internal set; }
 
         public string PathTable => Path.Combine(DB.PathRoot, TableID);
 
-        public FileDBTable() { }
+        public SimpleFileDBTable() { }
 
-        public FileDBTable(FileDB db, string tableid)
+        public SimpleFileDBTable(SimpleFileDB db, string tableid)
         {
             this.DB = db;
             DB.ValidateIndex(tableid);

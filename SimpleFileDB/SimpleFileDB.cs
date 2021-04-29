@@ -4,21 +4,21 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace FileDB
+namespace SimpleFileDB
 {
-    public class FileDB
+    public class SimpleFileDB
     {
         public readonly string PathRoot;
 
         internal readonly SemaphoreSlim sm = new SemaphoreSlim(1);
 
-        public FileDB(string pathroot)
+        public SimpleFileDB(string pathroot)
         {
-            if (!Directory.Exists(pathroot)) throw new Exception($"File DB directory does not exist: {pathroot}");
+            if (!Directory.Exists(pathroot)) throw new Exception($"Simple File DB directory does not exist: {pathroot}");
             this.PathRoot = pathroot;
         }
 
-        public virtual FileDBTable this[string table] => GetTable<FileDBTable>(table);
+        public virtual SimpleFileDBTable this[string table] => GetTable<SimpleFileDBTable>(table);
 
         internal const string ValidIndexChars = "abcdefghijklmnopqrstuvwxyz@.-,_!#$%^&()=+[]{};'~`ñ€´ç 0123456789";
 
@@ -46,7 +46,7 @@ namespace FileDB
             return exists;
         }
 
-        protected T GetTable<T>(string table) where T : FileDBTable, new() => new T() { DB = this, TableID = table };
+        protected T GetTable<T>(string table) where T : SimpleFileDBTable, new() => new T() { DB = this, TableID = table };
 
         internal string GetPathTable(string index) => Path.Combine(PathRoot, index);
 

@@ -1,6 +1,6 @@
-# FileDB
+# SimpleFileDB
 
-FileDB is a free, fast, multiplatform, lightweight .NET Standard database library.
+SimpleFileDB is a free, fast, multiplatform, lightweight .NET Standard database library.
 
 Databases are split into tables (stored as folders). Tables are split into rows (stored as JSON files). Rows are split into columns (stored as first-level properties in a JSON file).
 
@@ -10,7 +10,7 @@ Databases are split into tables (stored as folders). Tables are split into rows 
 using System;
 using System.IO;
 
-namespace FileDB.Sample
+namespace SimpleFileDB.Sample
 {
     class MySampleRowClass
     {
@@ -32,7 +32,7 @@ namespace FileDB.Sample
             string table1_row1_index = "first row";
             string table1_row2_index = "second row";
 
-            FileDB db = new FileDB(pathdb);
+            SimpleFileDB db = new SimpleFileDB(pathdb);
 
             db.CreateTable(table1_name);
             db[table1_name][table1_row1_index] = "the content of the first row is simply a string";
