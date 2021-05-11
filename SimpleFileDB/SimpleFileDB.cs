@@ -29,32 +29,36 @@ namespace SimpleFileDB
         /// <returns>Object which represents a table and allows accessing its rows.</returns>
         public virtual SimpleFileDBTable this[string table] => GetTable<SimpleFileDBTable>(table);
 
-        internal const string ValidIndexChars = "abcdefghijklmnopqrstuvwxyz@.-,_!#$%^&()=+[]{};'~`ñ€´ç 0123456789";
+        public const string ValidIndexChars = "abcdefghijklmnopqrstuvwxyz@.-,_!#$%^&()=+[]{};'~`ñ€´ç 0123456789";
 
         /// <summary>Create a new table.</summary>
         /// <param name="table">Table name/index/ID.</param>
-        public void CreateTable(string table)
+        public virtual void CreateTable(string table)
         {
             Directory.CreateDirectory(GetPathTable(table));
         }
 
-        public virtual void ValidateIndex(string index)
+        public virtual void ValidateTableID(string index) => ValidateIndex(index, ValidIndexChars);
+
+        public virtual void ValidateRowID(string tableid, string index) => ValidateIndex(index, ValidIndexChars);
+
+        protected void ValidateIndex(string index, string validchars)
         {
             foreach (char c in index)
             {
                 if (char.IsUpper(c)) throw new Exception($"Invalid index '{index}' with character '{c}'. Uppercase characters are not allowed.");
-                if (!ValidIndexChars.Contains(c.ToString())) throw new Exception($"Invalid index '{index}' with character '{c}'. Make sure it's all lowercase and non-special characters.");
+                if (!validchars.Contains(c.ToString())) throw new Exception($"Invalid index '{index}' with character '{c}'. Make sure it's all lowercase and non-special characters.");
             }
         }
 
         /// <summary>Check if a table exists.</summary>
-        /// <param name="index">Table name/index/ID.</param>
+        /// <param name="tableid">Table name/index/ID.</param>
         /// <returns>True if the table exists. Otherwise false.</returns>
-        public bool TableExists(string index)
+        public bool TableExists(string tableid)
         {
             sm.Wait(TimeSpan.FromSeconds(10));
-            ValidateIndex(index);
-            string pathFile = GetPathTable(index);
+            ValidateTableID(tableid);
+            string pathFile = GetPathTable(tableid);
             bool exists = Directory.Exists(pathFile);
             sm.Release(1);
             return exists;
@@ -71,6 +75,6 @@ namespace SimpleFileDB
         /// <summary>Delete a table and, optionally, its contents.</summary>
         /// <param name="tableindex">Table name/index/ID.</param>
         /// <param name="deletecontents">If true, the contents (rows) of the table are also deleted. If false and the table is not empty it throws an exception.</param>
-        public void DeleteTable(string tableindex, bool deletecontents) => Directory.Delete(GetPathTable(tableindex), deletecontents);
+        public virtual void DeleteTable(string tableindex, bool deletecontents) => Directory.Delete(GetPathTable(tableindex), deletecontents);
     }
 }

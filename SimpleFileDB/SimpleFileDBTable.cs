@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,17 +30,17 @@ namespace SimpleFileDB
         public SimpleFileDBTable(SimpleFileDB db, string tableid)
         {
             this.DB = db;
-            DB.ValidateIndex(tableid);
+            DB.ValidateTableID(tableid);
             this.TableID = tableid;
         }
 
         /// <summary>Check if a row exists.</summary>
-        /// <param name="index">Row index.</param>
+        /// <param name="rowindex">Row index.</param>
         /// <returns>True if the row exists. Otherwise false.</returns>
-        public bool RowExists(string index)
+        public bool RowExists(string rowindex)
         {
-            DB.ValidateIndex(index);
-            string pathFile = GetPathRow(index);
+            DB.ValidateRowID(TableID, rowindex);
+            string pathFile = GetPathRow(rowindex);
             return File.Exists(pathFile);
         }
 
@@ -54,7 +55,7 @@ namespace SimpleFileDB
             await DB.sm.WaitAsync(TimeSpan.FromSeconds(10));
             try
             {
-                DB.ValidateIndex(rowindex);
+                DB.ValidateRowID(TableID, rowindex);
                 string pathFile = GetPathRow(rowindex);
                 if (!File.Exists(pathFile)) throw new Exception($"Row with index '{rowindex}' does not exist in table '{TableID}'.");
                 string json = await File.ReadAllTextAsync(pathFile);
@@ -75,7 +76,7 @@ namespace SimpleFileDB
             await DB.sm.WaitAsync(TimeSpan.FromSeconds(10));
             try
             {
-                DB.ValidateIndex(rowindex);
+                DB.ValidateRowID(TableID, rowindex);
                 string pathFile = GetPathRow(rowindex);
                 string json = JsonConvert.SerializeObject(value, Formatting.Indented);
                 await File.WriteAllTextAsync(pathFile, json);
@@ -88,10 +89,10 @@ namespace SimpleFileDB
 
         /// <summary>Reads or writes a row.</summary>
         /// <param name="rowindex">Row ID (index).</param>
-        /// <returns>The row, as a raw object.</returns>
+        /// <returns>The row, as a raw <see cref="JObject"/>.</returns>
         public object this[string rowindex]
         {
-            get => GetRow<object>(rowindex);
+            get => GetRow<JObject>(rowindex).Result;
             set => WriteRow(rowindex, value).Wait();
         }
 
