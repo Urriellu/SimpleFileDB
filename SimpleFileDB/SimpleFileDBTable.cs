@@ -105,5 +105,7 @@ namespace SimpleFileDB
         /// <summary>Delete a row.</summary>
         /// <param name="rowindex">Row ID (index).</param>
         public virtual void Delete(string rowindex) => File.Delete(GetPathRow(rowindex));
+
+        public void ValidateRowID(string id) => DB.ValidateRowID(TableID, id);
     }
 }
