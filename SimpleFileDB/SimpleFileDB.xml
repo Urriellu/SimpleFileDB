@@ -27,7 +27,7 @@
         </member>
         <member name="M:SimpleFileDB.SimpleFileDB.TableExists(System.String)">
             <summary>Check if a table exists.</summary>
-            <param name="index">Table name/index/ID.</param>
+            <param name="tableid">Table name/index/ID.</param>
             <returns>True if the table exists. Otherwise false.</returns>
         </member>
         <member name="M:SimpleFileDB.SimpleFileDB.GetTable``1(System.String)">
@@ -60,7 +60,7 @@
         </member>
         <member name="M:SimpleFileDB.SimpleFileDBTable.RowExists(System.String)">
             <summary>Check if a row exists.</summary>
-            <param name="index">Row index.</param>
+            <param name="rowindex">Row index.</param>
             <returns>True if the row exists. Otherwise false.</returns>
         </member>
         <member name="P:SimpleFileDB.SimpleFileDBTable.AllKeys">
@@ -79,7 +79,7 @@
         <member name="P:SimpleFileDB.SimpleFileDBTable.Item(System.String)">
             <summary>Reads or writes a row.</summary>
             <param name="rowindex">Row ID (index).</param>
-            <returns>The row, as a raw object.</returns>
+            <returns>The row, as a raw <see cref="T:Newtonsoft.Json.Linq.JObject"/>.</returns>
         </member>
         <member name="M:SimpleFileDB.SimpleFileDBTable.GetRowCreationTime(System.String)">
             <summary>Get the time when a row was created.</summary>
