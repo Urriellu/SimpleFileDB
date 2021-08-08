@@ -76,7 +76,17 @@ namespace SimpleFileDB
                 DB.ValidateRowID(TableID, rowindex);
                 string pathFile = GetPathRow(rowindex);
                 string json = JsonConvert.SerializeObject(value, Formatting.Indented);
-                await File.WriteAllTextAsync(pathFile, json);
+                try { await File.WriteAllTextAsync(pathFile, json); }
+                catch (IOException)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    try { await File.WriteAllTextAsync(pathFile, json); } // retry after one second
+                    catch (IOException)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+                        await File.WriteAllTextAsync(pathFile, json); // retry again after 5 seconds... or let it crash
+                    }
+                }
             }
             finally
             {
