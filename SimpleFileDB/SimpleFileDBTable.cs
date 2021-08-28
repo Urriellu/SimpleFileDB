@@ -57,6 +57,7 @@ namespace SimpleFileDB
                 if (!File.Exists(pathFile)) throw new Exception($"Row with index '{rowindex}' does not exist in table '{TableID}'.");
                 string json = await File.ReadAllTextAsync(pathFile);
                 T v = JsonConvert.DeserializeObject<T>(json);
+                if (v == null) throw new Exception($"Unable to parse file: {pathFile}");
                 return v;
             }
             finally
