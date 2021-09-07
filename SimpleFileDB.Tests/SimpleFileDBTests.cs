@@ -30,7 +30,7 @@ namespace SimpleFileDB
             string table1_name = RandomString(3, 15, SimpleFileDB.ValidIndexChars);
             string table1_row1_index = RandomString(3, 15, SimpleFileDB.ValidIndexChars);
 
-            SimpleFileDB db = new SimpleFileDB(pathdb);
+            SimpleFileDB db = new SimpleFileDB(pathdb, IOPriorityClass.L03_HighEffort);
 
             // Create table
             Assert.IsFalse(db.TableExists(table1_name));

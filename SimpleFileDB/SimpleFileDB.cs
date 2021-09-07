@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.NG;
 using System.Threading;
 
 namespace SimpleFileDB
@@ -16,10 +17,12 @@ namespace SimpleFileDB
 
         /// <summary>Creates a new database object which allows accessing the file-based database stored at the given path.</summary>
         /// <param name="pathroot">Path to the directory that contains the database. This folder must exist.</param>
-        public SimpleFileDB(string pathroot)
+        /// <param name="iopriority">The Disk (I/O) priority to use when reading/writing to files and directories on disk.</param>
+        public SimpleFileDB(string pathroot, IOPriorityClass iopriority)
         {
-            if (!Directory.Exists(pathroot)) throw new Exception($"Simple File DB directory does not exist: {pathroot}");
+            if (!DirectoryNG.Exists(pathroot, iopriority: iopriority)) throw new Exception($"Simple File DB directory does not exist: {pathroot}");
             this.PathRoot = pathroot;
+            this.IOPriority = iopriority;
         }
 
         /// <summary>Retrieve a table.</summary>
@@ -29,11 +32,13 @@ namespace SimpleFileDB
 
         public const string ValidIndexChars = "abcdefghijklmnopqrstuvwxyz@.-,_!#$%^&()=+[]{};'~`ñ€´ç 0123456789";
 
+        public IOPriorityClass IOPriority = IOPriorityClass.L02_NormalEffort;
+
         /// <summary>Create a new table.</summary>
         /// <param name="table">Table name/index/ID.</param>
         public virtual void CreateTable(string table)
         {
-            Directory.CreateDirectory(GetPathTable(table));
+            DirectoryNG.CreateDirectory(GetPathTable(table), iopriority: IOPriority);
         }
 
         public virtual void ValidateTableID(string index) => ValidateIndex(index, ValidIndexChars);
@@ -57,7 +62,7 @@ namespace SimpleFileDB
             sm.Wait(TimeSpan.FromSeconds(10));
             ValidateTableID(tableid);
             string pathFile = GetPathTable(tableid);
-            bool exists = Directory.Exists(pathFile);
+            bool exists = DirectoryNG.Exists(pathFile, iopriority: IOPriority);
             sm.Release(1);
             return exists;
         }
@@ -73,6 +78,6 @@ namespace SimpleFileDB
         /// <summary>Delete a table and, optionally, its contents.</summary>
         /// <param name="tableindex">Table name/index/ID.</param>
         /// <param name="deletecontents">If true, the contents (rows) of the table are also deleted. If false and the table is not empty it throws an exception.</param>
-        public virtual void DeleteTable(string tableindex, bool deletecontents) => Directory.Delete(GetPathTable(tableindex), deletecontents);
+        public virtual void DeleteTable(string tableindex, bool deletecontents) => DirectoryNG.Delete(GetPathTable(tableindex), deletecontents, iopriority: IOPriority);
     }
 }

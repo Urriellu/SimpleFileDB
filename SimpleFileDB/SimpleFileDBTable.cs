@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.IO.NG;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleFileDB
@@ -38,11 +41,11 @@ namespace SimpleFileDB
         {
             DB.ValidateRowID(TableID, rowindex);
             string pathFile = GetPathRow(rowindex);
-            return File.Exists(pathFile);
+            return FileNG.Exists(pathFile, iopriority: DB.IOPriority);
         }
 
         /// <summary>List of all row IDs.</summary>
-        public virtual string[] AllKeys => Directory.GetFiles(PathTable).Where(f => !f.StartsWith('.')).Select(f => Path.GetFileName(f)).ToArray();
+        public virtual string[] AllKeys => DirectoryNG.GetFiles(PathTable, iopriority: DB.IOPriority).Where(f => !f.StartsWith('.')).Select(f => Path.GetFileName(f)).ToArray();
 
         /// <summary>Retrieves a row from the database. Throws an exception if it doesn't exist.</summary>
         /// <typeparam name="T">Parse it as the given type.</typeparam>
@@ -54,9 +57,45 @@ namespace SimpleFileDB
             {
                 DB.ValidateRowID(TableID, rowindex);
                 string pathFile = GetPathRow(rowindex);
-                if (!File.Exists(pathFile)) throw new Exception($"Row with index '{rowindex}' does not exist in table '{TableID}'.");
-                string json = await File.ReadAllTextAsync(pathFile);
-                T v = JsonConvert.DeserializeObject<T>(json);
+                FileInfo fi = new FileInfo(pathFile);
+                if (!fi.Exists) throw new Exception($"Row with index '{rowindex}' does not exist in table '{TableID}'.");
+
+                string json = "";
+                T v;
+                try
+                {
+                    json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
+                    if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
+                    v = JsonConvert.DeserializeObject<T>(json);
+                }
+                catch
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+
+                    try
+                    {
+                        json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
+                        if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
+                        v = JsonConvert.DeserializeObject<T>(json);
+                    }
+                    catch
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+
+                        try
+                        {
+                            json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
+                            if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
+                            v = JsonConvert.DeserializeObject<T>(json);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debugger.Break();
+                            throw new Exception($"Unable to read and parse file '{pathFile}': {ex.Message}. Content: {json}.");
+                        }
+                    }
+                }
+
                 if (v == null) throw new Exception($"Unable to parse file: {pathFile}");
                 return v;
             }
@@ -77,15 +116,15 @@ namespace SimpleFileDB
                 DB.ValidateRowID(TableID, rowindex);
                 string pathFile = GetPathRow(rowindex);
                 string json = JsonConvert.SerializeObject(value, Formatting.Indented);
-                try { await File.WriteAllTextAsync(pathFile, json); }
+                try { await FileNG.WriteAllTextAsync(pathFile, json, iopriority: DB.IOPriority); }
                 catch (IOException)
                 {
                     await Task.Delay(TimeSpan.FromSeconds(1));
-                    try { await File.WriteAllTextAsync(pathFile, json); } // retry after one second
+                    try { await FileNG.WriteAllTextAsync(pathFile, json, iopriority: DB.IOPriority); } // retry after one second
                     catch (IOException)
                     {
                         await Task.Delay(TimeSpan.FromSeconds(5));
-                        await File.WriteAllTextAsync(pathFile, json); // retry again after 5 seconds... or let it crash
+                        await FileNG.WriteAllTextAsync(pathFile, json, iopriority: DB.IOPriority); // retry again after 5 seconds... or let it crash
                     }
                 }
             }
@@ -106,13 +145,9 @@ namespace SimpleFileDB
 
         public virtual string GetPathRow(string rowindex) => Path.Combine(PathTable, rowindex);
 
-        /// <summary>Get the time when a row was created.</summary>
-        /// <param name="rowindex">Row ID (index).</param>
-        public DateTime GetRowCreationTime(string rowindex) => File.GetCreationTime(GetPathRow(rowindex));
-
         /// <summary>Delete a row.</summary>
         /// <param name="rowindex">Row ID (index).</param>
-        public virtual void Delete(string rowindex) => File.Delete(GetPathRow(rowindex));
+        public virtual void Delete(string rowindex) => FileNG.Delete(GetPathRow(rowindex), iopriority: DB.IOPriority);
 
         public void ValidateRowID(string id) => DB.ValidateRowID(TableID, id);
     }
