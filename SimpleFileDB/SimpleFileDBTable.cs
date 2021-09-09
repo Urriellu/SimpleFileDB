@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.IO.NG;
@@ -24,6 +25,8 @@ namespace SimpleFileDB
 
         public SimpleFileDBTable() { }
 
+        public bool IsCacheEnabled = true;
+
         /// <summary>Create a new object that represents a Simple File Database table.</summary>
         /// <param name="db">Database this table belongs to.</param>
         /// <param name="tableid">Table name/index/ID.</param>
@@ -40,6 +43,7 @@ namespace SimpleFileDB
         public bool RowExists(string rowindex)
         {
             DB.ValidateRowID(TableID, rowindex);
+            if (IsCacheEnabled && cache.ContainsKey(rowindex)) return true; // if it's in the cache we don't need to read the file
             string pathFile = GetPathRow(rowindex);
             return FileNG.Exists(pathFile, iopriority: DB.IOPriority);
         }
@@ -47,11 +51,24 @@ namespace SimpleFileDB
         /// <summary>List of all row IDs.</summary>
         public virtual string[] AllKeys => DirectoryNG.GetFiles(PathTable, iopriority: DB.IOPriority).Where(f => !f.StartsWith('.')).Select(f => Path.GetFileName(f)).ToArray();
 
+        private readonly ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
+
         /// <summary>Retrieves a row from the database. Throws an exception if it doesn't exist.</summary>
         /// <typeparam name="T">Parse it as the given type.</typeparam>
         /// <param name="v">Row ID (index).</param>
         public virtual async Task<T> GetRow<T>(string rowindex)
         {
+            if (IsCacheEnabled)
+            {
+                try
+                {
+                    string cachedValue = cache[rowindex];
+                    T value = JsonConvert.DeserializeObject<T>(cachedValue);
+                    return value;
+                }
+                catch { }
+            }
+
             await DB.sm.WaitAsync(TimeSpan.FromSeconds(10));
             try
             {
@@ -90,13 +107,13 @@ namespace SimpleFileDB
                         }
                         catch (Exception ex)
                         {
-                            Debugger.Break();
                             throw new Exception($"Unable to read and parse file '{pathFile}': {ex.Message}. Content: {json}.");
                         }
                     }
                 }
 
                 if (v == null) throw new Exception($"Unable to parse file: {pathFile}");
+                if (IsCacheEnabled) cache[rowindex] = json;
                 return v;
             }
             finally
@@ -127,6 +144,7 @@ namespace SimpleFileDB
                         await FileNG.WriteAllTextAsync(pathFile, json, iopriority: DB.IOPriority); // retry again after 5 seconds... or let it crash
                     }
                 }
+                if (IsCacheEnabled) cache[rowindex] = json;
             }
             finally
             {
@@ -147,7 +165,11 @@ namespace SimpleFileDB
 
         /// <summary>Delete a row.</summary>
         /// <param name="rowindex">Row ID (index).</param>
-        public virtual void Delete(string rowindex) => FileNG.Delete(GetPathRow(rowindex), iopriority: DB.IOPriority);
+        public virtual void Delete(string rowindex)
+        {
+            FileNG.Delete(GetPathRow(rowindex), iopriority: DB.IOPriority);
+            cache.TryRemove(rowindex, out _);
+        }
 
         public void ValidateRowID(string id) => DB.ValidateRowID(TableID, id);
     }
