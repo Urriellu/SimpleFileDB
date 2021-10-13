@@ -18,7 +18,7 @@ namespace SimpleFileDB
         /// <summary>Creates a new database object which allows accessing the file-based database stored at the given path.</summary>
         /// <param name="pathroot">Path to the directory that contains the database. This folder must exist.</param>
         /// <param name="iopriority">The Disk (I/O) priority to use when reading/writing to files and directories on disk.</param>
-        public SimpleFileDB(string pathroot, IOPriorityClass iopriority)
+        public SimpleFileDB(string pathroot, IOPriorityClass iopriority = IOPriorityClass.L02_NormalEffort)
         {
             if (!DirectoryNG.Exists(pathroot, iopriority: iopriority)) throw new Exception($"Simple File DB directory does not exist: {pathroot}");
             this.PathRoot = pathroot;
