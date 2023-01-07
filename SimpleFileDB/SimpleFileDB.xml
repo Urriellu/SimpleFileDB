@@ -12,9 +12,10 @@
         <member name="F:SimpleFileDB.SimpleFileDB.PathRoot">
             <summary>Path to the directory that contains the entire database.</summary>
         </member>
-        <member name="M:SimpleFileDB.SimpleFileDB.#ctor(System.String)">
+        <member name="M:SimpleFileDB.SimpleFileDB.#ctor(System.String,System.IO.IOPriorityClass)">
             <summary>Creates a new database object which allows accessing the file-based database stored at the given path.</summary>
             <param name="pathroot">Path to the directory that contains the database. This folder must exist.</param>
+            <param name="iopriority">The Disk (I/O) priority to use when reading/writing to files and directories on disk.</param>
         </member>
         <member name="P:SimpleFileDB.SimpleFileDB.Item(System.String)">
             <summary>Retrieve a table.</summary>
@@ -80,10 +81,6 @@
             <summary>Reads or writes a row.</summary>
             <param name="rowindex">Row ID (index).</param>
             <returns>The row, as a raw <see cref="T:Newtonsoft.Json.Linq.JObject"/>.</returns>
-        </member>
-        <member name="M:SimpleFileDB.SimpleFileDBTable.GetRowCreationTime(System.String)">
-            <summary>Get the time when a row was created.</summary>
-            <param name="rowindex">Row ID (index).</param>
         </member>
         <member name="M:SimpleFileDB.SimpleFileDBTable.Delete(System.String)">
             <summary>Delete a row.</summary>
