@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Adrian B. [Urriellu]</Authors>
     <Company>SimpleFileDB</Company>
@@ -13,6 +12,7 @@
     <FileVersion>1.0.2.0</FileVersion>
     <Version>1.0.3</Version>
     <RepositoryUrl>https://github.com/Urriellu/SimpleFileDB</RepositoryUrl>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -20,8 +20,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Sys.IO.NG" Version="1.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Sys.IO.NG" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>
