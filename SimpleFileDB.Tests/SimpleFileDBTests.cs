@@ -8,10 +8,10 @@ namespace SimpleFileDB
     [TestClass]
     public class SimpleFileDBTests
     {
-        static Random rnd = new Random();
+        static Random rnd = new();
         public static string RandomString(int minlength, int maxlength) => RandomString(rnd.Next(minlength, maxlength));
         public static string RandomString(int minlength, int maxlength, string chars) => RandomString(rnd.Next(minlength, maxlength), chars);
-        public static string RandomString(int length, string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") => new string(Enumerable.Repeat(chars, length).Select(s => s[rnd.Next(s.Length)]).ToArray());
+        public static string RandomString(int length, string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") => new(Enumerable.Repeat(chars, length).Select(s => s[rnd.Next(s.Length)]).ToArray());
 
         class MySampleRowClass
         {

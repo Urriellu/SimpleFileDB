@@ -13,7 +13,7 @@ namespace SimpleFileDB
         /// <summary>Path to the directory that contains the entire database.</summary>
         public readonly string PathRoot;
 
-        internal readonly SemaphoreSlim sm = new SemaphoreSlim(1);
+        internal readonly SemaphoreSlim sm = new(1);
 
         /// <summary>Creates a new database object which allows accessing the file-based database stored at the given path.</summary>
         /// <param name="pathroot">Path to the directory that contains the database. This folder must exist.</param>
@@ -71,7 +71,7 @@ namespace SimpleFileDB
         /// <typeparam name="T">Class which represents the table. It must derived from <see cref="SimpleFileDBTable"/>.</typeparam>
         /// <param name="table">Table name/index/ID.</param>
         /// <returns>The table object.</returns>
-        protected T GetTable<T>(string table) where T : SimpleFileDBTable, new() => new T() { DB = this, TableID = table };
+        protected T GetTable<T>(string table) where T : SimpleFileDBTable, new() => new() { DB = this, TableID = table };
 
         internal string GetPathTable(string index) => Path.Combine(PathRoot, index);
 

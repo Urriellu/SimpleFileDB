@@ -51,7 +51,7 @@ namespace SimpleFileDB
         /// <summary>List of all row IDs.</summary>
         public virtual string[] AllKeys => DirectoryNG.GetFiles(PathTable, iopriority: DB.IOPriority).Where(f => !f.StartsWith('.')).Select(f => Path.GetFileName(f)).ToArray();
 
-        private readonly ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, string> cache = new();
 
         /// <summary>Retrieves a row from the database. Throws an exception if it doesn't exist.</summary>
         /// <typeparam name="T">Parse it as the given type.</typeparam>
