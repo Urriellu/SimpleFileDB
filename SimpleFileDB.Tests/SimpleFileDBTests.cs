@@ -15,9 +15,9 @@ namespace SimpleFileDB
 
         class MySampleRowClass
         {
-            public int Aaa = 346;
-            public string Bbb = "Sample text.";
-            public float Ccc = 3.14159f;
+            public int Aaa { get; set; } = 346;
+            public string Bbb { get; set; } = "Sample text.";
+            public float Ccc { get; set; } = 3.14159f;
         }
 
         [TestMethod]

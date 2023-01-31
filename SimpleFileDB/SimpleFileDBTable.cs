@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.IO.NG;
 using System.Linq;
-using System.Threading;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace SimpleFileDB
@@ -63,7 +61,7 @@ namespace SimpleFileDB
                 try
                 {
                     string cachedValue = cache[rowindex];
-                    T value = JsonConvert.DeserializeObject<T>(cachedValue);
+                    T value = JsonSerializer.Deserialize<T>(cachedValue);
                     return value;
                 }
                 catch { }
@@ -83,7 +81,7 @@ namespace SimpleFileDB
                 {
                     json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
                     if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
-                    v = JsonConvert.DeserializeObject<T>(json);
+                    v = JsonSerializer.Deserialize<T>(json);
                 }
                 catch
                 {
@@ -93,7 +91,7 @@ namespace SimpleFileDB
                     {
                         json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
                         if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
-                        v = JsonConvert.DeserializeObject<T>(json);
+                        v = JsonSerializer.Deserialize<T>(json);
                     }
                     catch
                     {
@@ -103,7 +101,7 @@ namespace SimpleFileDB
                         {
                             json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
                             if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
-                            v = JsonConvert.DeserializeObject<T>(json);
+                            v = JsonSerializer.Deserialize<T>(json);
                         }
                         catch (Exception ex)
                         {
@@ -132,7 +130,7 @@ namespace SimpleFileDB
             {
                 DB.ValidateRowID(TableID, rowindex);
                 string pathFile = GetPathRow(rowindex);
-                string json = JsonConvert.SerializeObject(value, Formatting.Indented);
+                string json = JsonSerializer.Serialize(value, JsonSerializerOptions);
                 try { await FileNG.WriteAllTextAsync(pathFile, json, iopriority: DB.IOPriority); }
                 catch (IOException)
                 {
@@ -152,12 +150,17 @@ namespace SimpleFileDB
             }
         }
 
+        private readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        };
+
         /// <summary>Reads or writes a row.</summary>
         /// <param name="rowindex">Row ID (index).</param>
         /// <returns>The row, as a raw <see cref="JObject"/>.</returns>
         public object this[string rowindex]
         {
-            get => GetRow<JObject>(rowindex).Result;
+            get => GetRow<JsonNode>(rowindex).Result;
             set => WriteRow(rowindex, value).Wait();
         }
 
