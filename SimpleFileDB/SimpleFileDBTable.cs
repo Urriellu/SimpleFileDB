@@ -5,6 +5,7 @@ using System.IO.NG;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SimpleFileDB
@@ -150,9 +151,13 @@ namespace SimpleFileDB
             }
         }
 
-        private readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
+        public readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
         {
-            WriteIndented = true
+            WriteIndented = true,
+            IgnoreReadOnlyProperties = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
         };
 
         /// <summary>Reads or writes a row.</summary>
