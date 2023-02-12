@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.NG;
 using System.Linq;
@@ -24,7 +25,21 @@ namespace SimpleFileDB
 
         public SimpleFileDBTable() { }
 
-        public bool IsCacheEnabled = true;
+        public const bool CachesEnabledByDefault = true;
+
+        public bool IsCacheEnabled
+        {
+            get
+            {
+                lock(cachesEnabledForTables) return !cachesEnabledForTables.ContainsKey(TableID) || cachesEnabledForTables[TableID];
+            }
+            set
+            {
+                lock(cachesEnabledForTables) cachesEnabledForTables[TableID] = value;
+            }
+        }
+
+        private static readonly Dictionary<string, bool> cachesEnabledForTables = new();
 
         /// <summary>Create a new object that represents a Simple File Database table.</summary>
         /// <param name="db">Database this table belongs to.</param>
