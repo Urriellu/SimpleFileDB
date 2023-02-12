@@ -166,7 +166,7 @@ namespace SimpleFileDB
             }
         }
 
-        public readonly JsonSerializerOptions JsonSerializerOptions = new ()
+        public static readonly JsonSerializerOptions JsonSerializerOptions = new ()
         {
             WriteIndented = true,
             IgnoreReadOnlyProperties = true,
