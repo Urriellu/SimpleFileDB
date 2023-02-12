@@ -25,6 +25,7 @@ namespace SimpleFileDB
             public float Ccc { get; set; } = 3.14159f;
             public MySampleEnum TheEnum { get; set; } = MySampleEnum.Default;
             [JsonIgnore] public string ShouldBeIgnored = "to be ignored";
+            public string ToBeRemoved { get; set; } = "remove me manually";
         }
 
         [TestMethod]
@@ -42,6 +43,7 @@ namespace SimpleFileDB
             // Create table
             Assert.IsFalse(db.TableExists(table1_name));
             db.CreateTable(table1_name);
+            db[table1_name].IsCacheEnabled = false;
             Assert.IsTrue(db.TableExists(table1_name));
 
             // Write, then read a row as string
@@ -70,8 +72,15 @@ namespace SimpleFileDB
                 TheEnum = MySampleEnum.SecondValue
             };
             db[table1_name][table1_row1_index] = row1_obj_expected;
-            MySampleRowClass row1_obj_readvalue = db[table1_name].GetRow<MySampleRowClass>(table1_row1_index).Result;
+            
+            // remove one property from the JSON
             string json = File.ReadAllText(db[table1_name].GetPathRow(table1_row1_index));
+            Assert.IsTrue(json.Contains(nameof(MySampleRowClass.ToBeRemoved)));
+            File.WriteAllText(db[table1_name].GetPathRow(table1_row1_index), json.Replace($",\n  \"{nameof(MySampleRowClass.ToBeRemoved)}\": \"{row1_obj_expected.ToBeRemoved}\"", ""));
+            json = File.ReadAllText(db[table1_name].GetPathRow(table1_row1_index));
+            Assert.IsFalse(json.Contains(nameof(MySampleRowClass.ToBeRemoved)));
+            
+            MySampleRowClass row1_obj_readvalue = db[table1_name].GetRow<MySampleRowClass>(table1_row1_index).Result;
             Assert.IsTrue(json.Contains("Aaa"), "Missing property, or not properly capitalized");
             Assert.IsFalse(json.ToLower().Contains("ignore"), "Property not ignored");
             Assert.IsTrue(json.Contains(nameof(MySampleEnum.SecondValue)));
