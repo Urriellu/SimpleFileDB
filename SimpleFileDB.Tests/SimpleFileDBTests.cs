@@ -2,6 +2,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
+using Microsoft.VisualBasic;
 
 namespace SimpleFileDB
 {
@@ -13,11 +15,16 @@ namespace SimpleFileDB
         public static string RandomString(int minlength, int maxlength, string chars) => RandomString(rnd.Next(minlength, maxlength), chars);
         public static string RandomString(int length, string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") => new(Enumerable.Repeat(chars, length).Select(s => s[rnd.Next(s.Length)]).ToArray());
 
+        
+        enum MySampleEnum { Default, SecondValue }
+        
         class MySampleRowClass
         {
             public int Aaa { get; set; } = 346;
             public string Bbb { get; set; } = "Sample text.";
             public float Ccc { get; set; } = 3.14159f;
+            public MySampleEnum TheEnum { get; set; } = MySampleEnum.Default;
+            [JsonIgnore] public string ShouldBeIgnored = "to be ignored";
         }
 
         [TestMethod]
@@ -55,9 +62,19 @@ namespace SimpleFileDB
             Assert.IsTrue(table1_row1_readvalue_rawjson == table1_row1_expectedvalue);
 
             // Write, then read a row as an object
-            MySampleRowClass row1_obj_expected = new MySampleRowClass() { Aaa = 8523644, Bbb = "Sample Row Test", Ccc = 2.7182818284590452f };
+            
+            MySampleRowClass row1_obj_expected = new MySampleRowClass() {
+                Aaa = 8523644,
+                Bbb = "Sample Row Test",
+                Ccc = 2.7182818284590452f,
+                TheEnum = MySampleEnum.SecondValue
+            };
             db[table1_name][table1_row1_index] = row1_obj_expected;
             MySampleRowClass row1_obj_readvalue = db[table1_name].GetRow<MySampleRowClass>(table1_row1_index).Result;
+            string json = File.ReadAllText(db[table1_name].GetPathRow(table1_row1_index));
+            Assert.IsTrue(json.Contains("Aaa"), "Missing property, or not properly capitalized");
+            Assert.IsFalse(json.ToLower().Contains("ignore"), "Property not ignored");
+            Assert.IsTrue(json.Contains(nameof(MySampleEnum.SecondValue)));
             Assert.IsTrue(row1_obj_expected.Aaa == row1_obj_readvalue.Aaa);
             Assert.IsTrue(row1_obj_expected.Bbb == row1_obj_readvalue.Bbb);
             Assert.IsTrue(row1_obj_expected.Ccc == row1_obj_readvalue.Ccc);

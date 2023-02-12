@@ -155,11 +155,11 @@ namespace SimpleFileDB
         {
             WriteIndented = true,
             IgnoreReadOnlyProperties = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = null, // null is PascalCase
+            DictionaryKeyPolicy = null, // null is PascalCase
             PropertyNameCaseInsensitive = true,
-            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            Converters = { new JsonStringEnumConverter(namingPolicy: null) } // null is PascalCase
         };
 
         /// <summary>Reads or writes a row.</summary>
