@@ -62,7 +62,7 @@ namespace SimpleFileDB
                 try
                 {
                     string cachedValue = cache[rowindex];
-                    T value = JsonSerializer.Deserialize<T>(cachedValue);
+                    T value = JsonSerializer.Deserialize<T>(cachedValue, JsonSerializerOptions);
                     return value;
                 }
                 catch { }
@@ -82,7 +82,7 @@ namespace SimpleFileDB
                 {
                     json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
                     if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
-                    v = JsonSerializer.Deserialize<T>(json);
+                    v = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
                 }
                 catch
                 {
@@ -92,7 +92,7 @@ namespace SimpleFileDB
                     {
                         json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
                         if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
-                        v = JsonSerializer.Deserialize<T>(json);
+                        v = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
                     }
                     catch
                     {
@@ -102,7 +102,7 @@ namespace SimpleFileDB
                         {
                             json = await FileNG.ReadAllTextAsync(pathFile, iopriority: DB.IOPriority);
                             if (string.IsNullOrEmpty(json)) throw new Exception($"File read as empty");
-                            v = JsonSerializer.Deserialize<T>(json);
+                            v = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
                         }
                         catch (Exception ex)
                         {
@@ -151,13 +151,15 @@ namespace SimpleFileDB
             }
         }
 
-        public readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
+        public readonly JsonSerializerOptions JsonSerializerOptions = new ()
         {
             WriteIndented = true,
             IgnoreReadOnlyProperties = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
         };
 
         /// <summary>Reads or writes a row.</summary>
