@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.NG;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace SimpleFileDB
@@ -33,6 +35,17 @@ namespace SimpleFileDB
         public const string ValidIndexChars = "abcdefghijklmnopqrstuvwxyz@.-,_!#$%^&()=+[]{};'~`ñ€´ç 0123456789";
 
         public IOPriorityClass IOPriority = IOPriorityClass.L02_NormalEffort;
+        
+        public static readonly JsonSerializerOptions Options = new ()
+        {
+            WriteIndented = true,
+            IgnoreReadOnlyProperties = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = null, // null is PascalCase
+            DictionaryKeyPolicy = null, // null is PascalCase
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter(namingPolicy: null) } // null is PascalCase
+        };
 
         /// <summary>Create a new table.</summary>
         /// <param name="table">Table name/index/ID.</param>
